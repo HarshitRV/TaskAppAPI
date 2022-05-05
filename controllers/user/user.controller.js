@@ -15,37 +15,13 @@ module.exports.getUserProfile = catchAsync(async (req, res) => {
 })
 
 /**
- * @description - This function is used to get a user by id
- * @param {Object} req - The request object
- * @param {Object} res - The response object
- * @returns {Object} - The response object
- */
-module.exports.getUserById = catchAsync(async (req, res) => {
-    const { id } = req.params;
-
-    const user = await User.findById(id);
-
-    if(!user) return res.status(404).json({
-        status: "fail",
-        message: "No user found"
-    });
-
-    return res.status(200).json({
-        status: "success",
-        data: {
-            user
-        }
-    });
-})
-
-/**
  * @description - This function is used to update a user by id.
  * @param {Object} req - The request object
  * @param {Object} res - The response object
  * @returns {Object} - The response object
  * 
  */
-module.exports.updateUserById = catchAsync(async (req, res)=>{
+module.exports.updateUser = catchAsync(async (req, res)=>{
 
     const updates = Object.keys(req.body);
     const allowedUpdates = ["name", "email", "password", "age"];
@@ -57,8 +33,7 @@ module.exports.updateUserById = catchAsync(async (req, res)=>{
         allowedUpdates
     });
 
-    const { id } = req.params;
-    const user = await User.findById(id);
+    const { user } = req;
 
     if(!user) res.status(404).json({
         status: "fail",
@@ -66,6 +41,8 @@ module.exports.updateUserById = catchAsync(async (req, res)=>{
     });
 
     updates.forEach((update) => user[update] = req.body[update]);
+
+    console.log(user);
 
     await user.save();
 
@@ -84,15 +61,10 @@ module.exports.updateUserById = catchAsync(async (req, res)=>{
  * @returns {Object} - The response object
  * 
  */
-module.exports.deleteUserById = catchAsync(async (req, res)=>{
-    const { id } = req.params;
-
-    const user = await User.findByIdAndDelete(id);
-
-    if(!user) return res.status(404).json({
-        status: "fail",
-        message: "No user found"
-    });
+module.exports.deleteUser = catchAsync(async (req, res)=>{
+    
+    const { user } = req;
+    await user.remove();
 
     return res.status(200).json({
         status: "success",

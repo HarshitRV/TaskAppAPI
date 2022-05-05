@@ -15,6 +15,12 @@ const { newToken, verifyToken } = require("../../utils/jwt");
  module.exports.registerUser = catchAsync(async (req, res) => {
     const { name, email, password, age } = req.body;
 
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({
+        status: "fail",
+        message: "User already exists. Login instead."
+    })
+
     const user = new User({
         name,
         email,
@@ -49,7 +55,7 @@ const { newToken, verifyToken } = require("../../utils/jwt");
 
     if(!user) return res.status(400).json({
         status: "fail",
-        message: "Login failed"
+        message: "Invalid email or password"
     });
 
     const isMatch = await user.checkPassword(password);
@@ -71,3 +77,37 @@ const { newToken, verifyToken } = require("../../utils/jwt");
         }
     });
 });
+
+/**
+ * @description - This function is used to logout a user.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @returns {Object} - The response object
+ */
+module.exports.logoutUser = catchAsync(async (req, res)=>{
+
+    req.user.tokens = req.user.tokens.filter((token) => token.token !== req.token);
+    await req.user.save();
+
+    return res.status(200).json({
+        status: "success",
+        message: "Logged out successfully."
+    });
+
+});
+
+/**
+ * @description - This function is used to logout user from all the session.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @returns {Object} - The response object
+ */
+module.exports.logoutAll = catchAsync(async (req, res)=>{
+    req.user.tokens = [];
+    await req.user.save();
+
+    return res.status(200).json({
+        status: "success",
+        message: "Logged out from all devices."
+    })
+})

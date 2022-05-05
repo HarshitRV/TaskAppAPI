@@ -81,6 +81,32 @@ userSchema.methods.checkPassword = async function(password){
     });
 }
 
+/**
+ * @description - Virtuals are a way to create properties that are not stored 
+ *                in the database, but are computed from other properties.
+ *                 
+ *              - This virtual property returns all the tasks that are associated with
+ *                the current user.
+ */
+userSchema.virtual("tasks", {
+    ref: "Task",
+    localField: "_id",
+    foreignField: "owner"
+});
+
+/**
+ * @description - This function returns the public profile of the user.
+ *                without the password and tokens.
+ * 
+ * @returns {Object} - Returns the public profile of the user.
+ */
+userSchema.methods.toJSON = function(){
+    const userObject = this.toObject();
+    delete userObject.password;
+    delete userObject.tokens;
+    return userObject;
+}
+
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;

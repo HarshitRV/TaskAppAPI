@@ -11,11 +11,17 @@ const catchAsync = require("../../utils/catchAsync");
  * 
  */
 module.exports.createTask = catchAsync( async (req, res)=>{
-    const { description,  completed } = req.body;
+
+    const { user } = req;
+
+    if(!req.body.description) return res.status(400).json({
+        status: "fail",
+        message: "Description is required"
+    });
 
     const task = new Task({
-        description,
-        completed: Boolean(completed)
+        ...req.body,
+        owner: user._id
     });
 
     await task.save();
@@ -36,7 +42,11 @@ module.exports.createTask = catchAsync( async (req, res)=>{
  * 
  */
 module.exports.getAllTasks = catchAsync( async (req, res)=>{
-    const tasks = await Task.find();
+
+    const { user } = req;
+
+    const userWithTasks = await user.populate('tasks');
+    const tasks = userWithTasks.tasks
 
     if(!tasks) return res.status(404).json({
         status: "fail",
@@ -59,9 +69,10 @@ module.exports.getAllTasks = catchAsync( async (req, res)=>{
  * 
  */
 module.exports.getTaskById = catchAsync( async (req, res)=>{
+    const { user } =req;
     const { id } = req.params;
 
-    const task = await Task.findById(id);
+    const task = await Task.findOne({ _id: id, owner: user._id }).populate("owner");
 
     if(!task) return res.status(404).json({
         status: "fail",
