@@ -1,9 +1,11 @@
+// Utils import.
 const AppError = require("../../utils/AppError");
 const catchAsync = require("../../utils/catchAsync");
+const { newToken, verifyToken } = require("../../utils/jwt");
 
+// Models import.
 const User = require("../../models/user.model");
 
-const { newToken, verifyToken } = require("../../utils/jwt");
 
 /**
  * @description - This function is used to create a new user

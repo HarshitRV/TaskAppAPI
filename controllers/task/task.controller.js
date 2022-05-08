@@ -1,5 +1,8 @@
+// Model import.
 const Task = require("../../models/task.model");
+const { options } = require("../../routes/task.router");
 
+// Utility imports.
 const AppError = require("../../utils/AppError");
 const catchAsync = require("../../utils/catchAsync");
 
@@ -43,9 +46,28 @@ module.exports.createTask = catchAsync( async (req, res)=>{
  */
 module.exports.getAllTasks = catchAsync( async (req, res)=>{
 
+    const match = {};
+    const sort = {};
+
+    const { completed, limit=10, skip=0, sortBy } = req.query;
+
+    if(completed) match.completed = completed === "true";
+    if(sortBy) {
+        const parts = sortBy.split(":");
+        sort[parts[0]] = parts[1] === "desc" ? -1 : 1;
+    }
+
     const { user } = req;
 
-    const userWithTasks = await user.populate('tasks');
+    const userWithTasks = await user.populate({
+        path: "tasks",
+        match,
+        options: {
+            limit,
+            skip,
+            sort
+        },
+    });
     const tasks = userWithTasks.tasks
 
     if(!tasks) return res.status(404).json({
@@ -106,9 +128,10 @@ module.exports.updateTaskById = catchAsync( async (req, res)=>{
         allowedUpdates
     })
 
-    const { id } = req.params;
+    const { id:_id } = req.params;
+    const { user } = req;
 
-    const task = await Task.findById(id);
+    const task = await Task.findOne({ _id, owner: user._id });
 
     if(!task) return res.status(404).json({
         status: "fail",
@@ -118,11 +141,6 @@ module.exports.updateTaskById = catchAsync( async (req, res)=>{
     updates.forEach(update => task[update] = req.body[update]);
 
     await task.save();
-
-    if(!task) return res.status(404).json({
-        status: "fail",
-        message: "No task found"
-    });
 
     return res.status(200).json({
         status: "success",
@@ -139,9 +157,10 @@ module.exports.updateTaskById = catchAsync( async (req, res)=>{
  * @returns {Object} - The response object
  */
 module.exports.deleteTaskById = catchAsync( async (req, res)=>{
-    const { id } = req.params;
+    const { id: _id } = req.params;
+    const { user } = req;
 
-    const task = await Task.findByIdAndDelete(id);
+    const task = await Task.findOneAndDelete({ _id, owner: user._id });
 
     if(!task) return res.status(404).json({
         status: "fail",

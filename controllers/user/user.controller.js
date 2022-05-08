@@ -1,6 +1,11 @@
+// Node modules;
+const sharp = require('sharp');
+
+// Utils.
 const AppError = require("../../utils/AppError");
 const catchAsync = require("../../utils/catchAsync");
 
+// Models
 const User = require("../../models/user.model");
 
 /**
@@ -74,3 +79,60 @@ module.exports.deleteUser = catchAsync(async (req, res)=>{
     });
 });
 
+/**
+ * @description - This function is used to upload a user profile picture.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @returns {Object} - The response object
+ */
+module.exports.uploadAvatar = catchAsync(async (req, res)=>{
+    const { user, file } = req;
+    const buffer = await sharp(file.buffer)
+                        .resize({ width: 250, height: 250 })
+                        .png()
+                        .toBuffer();
+
+    user.avatar = buffer;
+
+    await user.save();
+
+    return res.status(200).json({
+        status: "success",
+        data: user
+    });
+});
+
+/**
+ * @description - This function is used to delete user profile picture.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @returns {Object} - The response object
+ */
+module.exports.deleteAvatar = catchAsync(async (req, res)=>{
+    const { user } = req;
+    user.avatar = undefined;
+    await user.save();
+    return res.status(200).json({
+        status: "success",
+        data: user
+    });
+});
+
+/**
+ * @description - This function is used to get user profile picture.
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @returns {Object} - The response object
+ */
+module.exports.getAvatar = catchAsync(async (req, res)=>{
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+
+    if(!user || !user.avatar) return res.status(404).json({
+        status: "fail",
+        message: "No avatar found"
+    });
+ 
+    return res.status(200).set('Content-Type', 'image/png').send(user.avatar);
+});

@@ -1,7 +1,13 @@
+// Node modules imports.
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+
+// Model imports.
+const Task = require("./task.model");
+
+// Declarations.
+const Schema = mongoose.Schema;
 
 const userSchema = Schema({
     name: {
@@ -45,7 +51,12 @@ const userSchema = Schema({
             type: String,
             required: true,
         }
-    }]
+    }],
+    avatar: {
+        type: Buffer
+    }
+}, {
+    timestamps: true
 });
 
 /**
@@ -60,6 +71,24 @@ userSchema.pre("save", async function(next) {
             this.password = hash;
         }
         next();
+    } catch (err) {
+        next(err);
+    }
+});
+
+/**
+ * @description - This function is used to delete all the task associate with
+ *                the given user before removing that user fromt the db.
+ * 
+ * @param {Object} next - The next object
+ * @returns {undefined} - undefined
+ */
+userSchema.pre("remove", async function(next){
+    try {
+
+        const user = this;
+        await Task.deleteMany({ owner: user._id });
+
     } catch (err) {
         next(err);
     }
@@ -104,6 +133,8 @@ userSchema.methods.toJSON = function(){
     const userObject = this.toObject();
     delete userObject.password;
     delete userObject.tokens;
+    delete userObject.avatar;
+    
     return userObject;
 }
 

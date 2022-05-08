@@ -17,8 +17,8 @@ TaskRouter.route("/tasks")
 
 TaskRouter.route("/tasks/:id")
     .get(auth, getTaskById)
-    .patch(updateTaskById)
-    .delete(deleteTaskById)
+    .patch(auth, updateTaskById)
+    .delete(auth, deleteTaskById)
   
 
 module.exports = TaskRouter;
