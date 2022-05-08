@@ -4,6 +4,8 @@ const sharp = require('sharp');
 // Utils.
 const AppError = require("../../utils/AppError");
 const catchAsync = require("../../utils/catchAsync");
+const sendMail = require("../../utils/nodemailer");
+const { welcomeEmail, byeEmail } = require("../../utils/emailTemplates");
 
 // Models
 const User = require("../../models/user.model");
@@ -69,12 +71,17 @@ module.exports.updateUser = catchAsync(async (req, res)=>{
 module.exports.deleteUser = catchAsync(async (req, res)=>{
     
     const { user } = req;
-    await user.remove();
+
+    const [deletedUser, mailInfo] = await Promise.all([
+        user.remove(),
+        sendMail(user.email, "Bye", byeEmail(user.name))
+    ]);
 
     return res.status(200).json({
         status: "success",
         data: {
-            user
+            deletedUser,
+            mailInfo
         }
     });
 });

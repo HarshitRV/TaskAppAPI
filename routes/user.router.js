@@ -1,28 +1,13 @@
 // Node modules.
 const { Router } = require('express');
-const multer = require("multer");
+
 
 // Middleware.
 const auth = require("../middlewares/auth");
 
 // Utils.
 const AppError = require("../utils/AppError");
-/**
- * fjkasdkfaskdfka
- */
-const storage = multer.memoryStorage();
-const upload = multer({
-    limits: {
-        fileSize: 1000000,
-    },
-    fileFilter(req, file, cb){
-        if(!file.originalname.match(/\.(jpg|png|jpeg)$/)){
-            return cb(new AppError(400, "Please upload an image file"));
-        }   
-        cb(undefined, true);
-    },
-    storage
-});
+const upload = require("../middlewares/multer")
 
 // User Auth controller imports.
 const {

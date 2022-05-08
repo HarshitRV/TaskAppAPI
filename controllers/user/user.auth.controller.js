@@ -2,6 +2,8 @@
 const AppError = require("../../utils/AppError");
 const catchAsync = require("../../utils/catchAsync");
 const { newToken, verifyToken } = require("../../utils/jwt");
+const sendMail = require("../../utils/nodemailer");
+const { welcomeEmail, byeEmail } = require("../../utils/emailTemplates");
 
 // Models import.
 const User = require("../../models/user.model");
@@ -33,13 +35,17 @@ const User = require("../../models/user.model");
     const token = newToken(user._id);
     user.tokens.push({ token });
 
-    await user.save();
+    const [mailInfo, savedUser] = await Promise.all([
+        sendMail(user.email, "Welcome to TaskApp", welcomeEmail(user.name)),
+        user.save()
+    ]);
 
     return res.status(201).json({
         status: "success",
         data: {
-            user,
-            token
+            savedUser,
+            token,
+            mailInfo
         }
     });
 });
