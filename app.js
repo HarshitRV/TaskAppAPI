@@ -1,18 +1,16 @@
-const { config } = require('dotenv');
-process.env.NODE_ENV !== 'production' && config();
+// Connect DB
+const connectDB = require("./db/db")
+const connect = async () => {
+    await connectDB();
+}
+connect();
 
 // Modules.
 const express = require('express');
 const morgan = require("morgan");
 
-// Configs.
-const SECRETS = require("./configs/config");
-
-// Utils.
-const connectDB = require("./db/db");
-
+// Declarations.
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Routers
 const UserRouter = require("./routes/user.router");
@@ -38,13 +36,4 @@ app.use((err, req, res, next) => {
     res.status(status).send({ err, message, stack });
 });
 
-
-app.listen(PORT, async () => {
-    if (SECRETS.NODE_ENV === 'production') {
-        await connectDB(SECRETS.MONGODB_ONLINE_URI);
-        console.log(`Server running on port ${PORT}`);
-    } else {
-        await connectDB(SECRETS.MONGODB_LOCAL_URI);
-        console.log(`Development server live on http://localhost:${PORT}`);
-    }
-});
+module.exports = app;

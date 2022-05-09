@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
  *
  * @returns {undefined}
  */
-const connectDB = async (uri = "mongodb://localhost:27017/taskDB") => {
+const connectDB = async (uri = process.env.MONGODB_URI) => {
     try {
         const con = await mongoose.connect(uri, {
             useNewUrlParser: true,

@@ -4,9 +4,12 @@
   "description": "A todo list app.",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "devstart": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "devstart": "env-cmd -f ./configs/dev.env nodemon server.js",
+    "test": "env-cmd -f ./configs/test.env jest --watch --all --detectOpenHandles"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "author": "HarshitRV",
   "license": "ISC",
@@ -21,5 +24,10 @@
     "nodemailer": "^6.7.5",
     "sharp": "^0.30.4",
     "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0",
+    "jest": "^28.1.0",
+    "supertest": "^6.2.3"
   }
 }

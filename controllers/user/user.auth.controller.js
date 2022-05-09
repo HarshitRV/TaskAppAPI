@@ -1,9 +1,9 @@
 // Utils import.
 const AppError = require("../../utils/AppError");
 const catchAsync = require("../../utils/catchAsync");
-const { newToken, verifyToken } = require("../../utils/jwt");
+const { newToken } = require("../../utils/jwt");
 const sendMail = require("../../utils/nodemailer");
-const { welcomeEmail, byeEmail } = require("../../utils/emailTemplates");
+const { welcomeEmail } = require("../../utils/emailTemplates");
 
 // Models import.
 const User = require("../../models/user.model");

@@ -5,7 +5,7 @@ const sharp = require('sharp');
 const AppError = require("../../utils/AppError");
 const catchAsync = require("../../utils/catchAsync");
 const sendMail = require("../../utils/nodemailer");
-const { welcomeEmail, byeEmail } = require("../../utils/emailTemplates");
+const { byeEmail } = require("../../utils/emailTemplates");
 
 // Models
 const User = require("../../models/user.model");
@@ -48,8 +48,6 @@ module.exports.updateUser = catchAsync(async (req, res)=>{
     });
 
     updates.forEach((update) => user[update] = req.body[update]);
-
-    console.log(user);
 
     await user.save();
 

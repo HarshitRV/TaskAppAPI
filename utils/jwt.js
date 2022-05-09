@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 
-const SECRETS = require("../configs/config");
 
 /**
  * @decription - This function is used to create a jwt token.
@@ -9,7 +8,7 @@ const SECRETS = require("../configs/config");
  * @returns {String} - JWT Token
  */
 const newToken = id => {
-    return jwt.sign({ id }, SECRETS.JWT_SECRET, { expiresIn: SECRETS.JWT_EXP });
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXP });
 }
 
 /**
@@ -19,7 +18,7 @@ const newToken = id => {
  * @returns {Object} - Payload of the token.
  */
 const verifyToken = token => new Promise((resolve, reject)=>{
-    jwt.verify(token, SECRETS.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if(err) reject(err);
         resolve(decoded);
     });

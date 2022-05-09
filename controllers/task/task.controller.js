@@ -1,6 +1,5 @@
 // Model import.
 const Task = require("../../models/task.model");
-const { options } = require("../../routes/task.router");
 
 // Utility imports.
 const AppError = require("../../utils/AppError");
