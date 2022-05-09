@@ -132,7 +132,7 @@ dist
 
 # ignore these too
 test.js
-Tests
+
 test
 playground
 *.env
