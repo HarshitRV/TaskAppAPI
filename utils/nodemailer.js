@@ -34,4 +34,3 @@ const sendMail = async (email, subject, html) => {
     return info
 }
 
-module.exports = sendMail;
